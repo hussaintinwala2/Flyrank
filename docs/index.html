@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Content Performance Decline: A Validation-Aware Analysis</title>
+
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #5d6678;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --border: #e2e6ee;
+      --success: #15803d;
+      --warning: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 72px 20px;
+    }
+
+    header .container {
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    .eyebrow {
+      color: #93c5fd;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin: 15px 0 20px;
+      max-width: 900px;
+    }
+
+    .subtitle {
+      color: #d1d5db;
+      max-width: 800px;
+      font-size: 1.15rem;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 34px;
+      margin-bottom: 28px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    h3 {
+      margin-top: 28px;
+    }
+
+    p {
+      color: var(--muted);
+    }
+
+    .abstract {
+      border-left: 5px solid var(--accent);
+      background: var(--accent-light);
+      padding: 22px 25px;
+      border-radius: 10px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin: 25px 0;
+    }
+
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      background: #fafbfc;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.8rem;
+      color: var(--text);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 13px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+    }
+
+    .callout {
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    .warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    .success {
+      border-left: 4px solid var(--success);
+    }
+
+    ul {
+      color: var(--muted);
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    code {
+      background: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .recommendation {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .rank {
+      display: inline-block;
+      background: #111827;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      margin-right: 8px;
+      font-weight: 700;
+    }
+
+    footer {
+      background: #111827;
+      color: #d1d5db;
+      padding: 45px 20px;
+      margin-top: 50px;
+    }
+
+    footer .container {
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    footer a {
+      color: #93c5fd;
+    }
+
+    @media (max-width: 650px) {
+      section {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <div class="eyebrow">FlyRank ML Internship · Capstone Research</div>
+
+    <h1>
+      Content Performance Decline:
+      A Validation-Aware Analysis
+    </h1>
+
+    <p class="subtitle">
+      A decision-support study of whether March 2026 search-performance
+      signals provide useful directional evidence about April 2026
+      content-performance decline.
+    </p>
+  </div>
+</header>
+
+<main>
+
+  <!-- ABSTRACT -->
+
+  <section id="abstract">
+    <h2>Abstract</h2>
+
+    <div class="abstract">
+      <p>
+        This study asks whether observed March 2026 search-performance
+        signals can provide useful directional evidence about content
+        pages that experience lower search impressions in April 2026.
+        The analysis uses March impressions, clicks, and average position
+        as predictive features and defines decline as April impressions
+        falling below 80% of March impressions. A Logistic Regression model
+        was evaluated using a client-grouped validation design so that
+        clients in the test set were not present in training. The observed
+        grouped ROC-AUC was 0.538, indicating limited predictive separation
+        under this more demanding validation design. The resulting output
+        is therefore presented as decision-support for human review rather
+        than as an automatic content optimization system.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- 1. INTRODUCTION -->
+
+  <section id="introduction">
+    <h2>1. Introduction / Problem Statement</h2>
+
+    <p>
+      Content teams may manage large numbers of pages whose search
+      performance changes over time. A practical question is whether
+      historical search-performance signals can help reviewers decide
+      which pages deserve attention first.
+    </p>
+
+    <p>
+      This project studies that question using a decision-point design:
+      March 2026 observations are treated as information available when
+      making a decision, while April 2026 performance provides the later
+      outcome.
+    </p>
+
+    <p>
+      The research question is:
+    </p>
+
+    <div class="callout success">
+      <strong>
+        Can March search-performance signals provide useful directional
+        evidence for identifying pages whose April search impressions
+        decline?
+      </strong>
+    </div>
+
+    <p>
+      The practical decision supported by the analysis is not whether to
+      automatically change a page. Instead, the output is a ranked queue
+      that can help a human reviewer decide which pages to inspect first.
+    </p>
+  </section>
+
+
+  <!-- 2. DATA -->
+
+  <section id="data">
+    <h2>2. Data</h2>
+
+    <p>
+      This analysis uses the FlyRank ML Internship dataset. The underlying
+      warehouse contains content-level search-performance and content
+      metadata used to construct the decision-point dataset.
+    </p>
+
+    <h3>Decision windows</h3>
+
+    <ul>
+      <li>
+        <strong>Feature window:</strong> March 2026
+      </li>
+      <li>
+        <strong>Outcome window:</strong> April 2026
+      </li>
+      <li>
+        <strong>Decision point:</strong> March 31, 2026
+      </li>
+    </ul>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <strong>176,738</strong>
+        <span>usable modeling rows</span>
+      </div>
+
+      <div class="metric">
+        <strong>47</strong>
+        <span>clients represented</span>
+      </div>
+
+      <div class="metric">
+        <strong>27.6%</strong>
+        <span>positive rate in the final grouped-model dataset</span>
+      </div>
+    </div>
+
+    <h3>Predictive features</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Window</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>March impressions</td>
+          <td>March 2026</td>
+          <td>Predictive feature</td>
+        </tr>
+        <tr>
+          <td>March clicks</td>
+          <td>March 2026</td>
+          <td>Predictive feature</td>
+        </tr>
+        <tr>
+          <td>March average position</td>
+          <td>March 2026</td>
+          <td>Predictive feature</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Excluded information</h3>
+
+    <p>
+      April outcome fields were excluded from the predictive feature set
+      because they occur after the March decision point. The client
+      identifier was also not used as a predictive feature. It was used
+      only to create the grouped validation split.
+    </p>
+
+    <p>
+      Private client names, URLs, search queries, and other identifying
+      information are not presented in this public artifact.
+    </p>
+  </section>
+
+
+  <!-- 3. METHODOLOGY -->
+
+  <section id="methodology">
+    <h2>3. Methodology</h2>
+
+    <h3>Target definition</h3>
+
+    <p>
+      A page is labelled <code>is_declining = 1</code> when its April
+      impressions are less than 80% of its March impressions.
+      Otherwise it is labelled 0.
+    </p>
+
+    <p>
+      This is an operational definition for the analysis. It should not
+      be interpreted as a universal definition of content decline.
+    </p>
+
+    <h3>Model</h3>
+
+    <p>
+      The predictive model is a Logistic Regression pipeline with
+      standardization of the three March features.
+    </p>
+
+    <h3>Validation design</h3>
+
+    <p>
+      The primary evaluation uses a client-grouped split. Thirty-five
+      clients were used for training and twelve previously unseen clients
+      were used for testing.
+    </p>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <strong>35</strong>
+        <span>training clients</span>
+      </div>
+
+      <div class="metric">
+        <strong>12</strong>
+        <span>test clients</span>
+      </div>
+
+      <div class="metric">
+        <strong>0</strong>
+        <span>client overlap</span>
+      </div>
+
+      <div class="metric">
+        <strong>0.538</strong>
+        <span>grouped ROC-AUC</span>
+      </div>
+    </div>
+
+    <h3>Leakage checks</h3>
+
+    <div class="callout success">
+      <strong>Leakage audit passed.</strong>
+      <p>
+        No April outcome field was included among the predictive features.
+        The client identifier was not used as a model feature and there
+        was zero client overlap between the grouped training and test sets.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- 4. RESULTS -->
+
+  <section id="results">
+    <h2>4. Results</h2>
+
+    <p>
+      Validation design materially affected the observed model score.
+      The earlier random split produced a ROC-AUC of 0.586, while the
+      client-grouped validation produced a ROC-AUC of 0.538.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Validation design</th>
+          <th>ROC-AUC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Random split — earlier evaluation</td>
+          <td>0.586</td>
+        </tr>
+        <tr>
+          <td><strong>Client-grouped split — primary result</strong></td>
+          <td><strong>0.538</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warning">
+      <strong>Observed change: −0.048 ROC-AUC.</strong>
+
+      <p>
+        The lower score under client-grouped validation suggests that
+        performance observed under a random split does not fully carry
+        over to previously unseen clients.
+      </p>
+    </div>
+
+    <h3>Interpretation</h3>
+
+    <p>
+      The grouped result is the more relevant measure for this project's
+      intended generalization question. A ROC-AUC of 0.538 represents
+      limited separation, so the model should not be presented as a
+      reliable predictor of future decline.
+    </p>
+
+    <p>
+      The result is better described as a measured, directional signal
+      that may support prioritization and human review.
+    </p>
+  </section>
+
+
+  <!-- 5. LIMITATIONS -->
+
+  <section id="limitations">
+    <h2>5. Limitations & Honest Framing</h2>
+
+    <p>
+      Several limitations constrain what can be concluded from this study.
+    </p>
+
+    <ul>
+      <li>
+        The grouped ROC-AUC of 0.538 indicates limited predictive
+        separation.
+      </li>
+
+      <li>
+        The study does not establish that changing a page will improve
+        search performance.
+      </li>
+
+      <li>
+        The analysis does not estimate financial value or expected traffic
+        gains from an intervention.
+      </li>
+
+      <li>
+        Search demand, competitor changes, search-engine behavior,
+        content quality, seasonality, and business priorities are not
+        fully represented by the three predictive features.
+      </li>
+
+      <li>
+        The April decline label is an operational threshold rather than
+        a universal definition of content deterioration.
+      </li>
+
+      <li>
+        The ranked action queue is a prioritization tool and requires
+        human interpretation.
+      </li>
+    </ul>
+
+    <div class="callout">
+      <strong>Safe claim:</strong>
+
+      <p>
+        The analysis observed and measured a limited directional signal
+        under client-grouped validation. It does not demonstrate that the
+        model can reliably predict future decline or that recommended
+        content changes will improve performance.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- 6. RECOMMENDATIONS -->
+
+  <section id="recommendations">
+    <h2>6. Ranked Recommendations</h2>
+
+    <p>
+      The action playbook converts observed March signals into a queue for
+      human review. It is explicitly designed as decision-support rather
+      than automatic content optimization.
+    </p>
+
+    <div class="recommendation">
+      <span class="rank">1</span>
+      <strong>Review pages with low observed CTR</strong>
+
+      <p>
+        Reason code: <code>LOW_CTR</code>.
+        These pages should be reviewed for search-result presentation,
+        including whether the title and snippet clearly communicate the
+        page's value.
+      </p>
+    </div>
+
+    <div class="recommendation">
+      <span class="rank">2</span>
+      <strong>Review stale pages with low CTR</strong>
+
+      <p>
+        Reason code: <code>STALE_AND_LOW_CTR</code>.
+        These pages combine an observed low-CTR signal with a longer
+        period since the recorded content update and therefore receive
+        higher review priority.
+      </p>
+    </div>
+
+    <div class="recommendation">
+      <span class="rank">3</span>
+      <strong>Review stale pages</strong>
+
+      <p>
+        Reason code: <code>STALE</code>.
+        These pages may deserve a human review to determine whether the
+        content is still accurate and useful.
+      </p>
+    </div>
+
+    <h3>Human review rules</h3>
+
+    <ul>
+      <li>Review the page context before taking action.</li>
+      <li>Check whether the search-result presentation is appropriate.</li>
+      <li>Check whether the content is still accurate and useful.</li>
+      <li>Consider search demand and business priorities.</li>
+      <li>Use the queue as prioritization evidence, not as a final decision.</li>
+    </ul>
+
+    <h3>What should NOT be automated</h3>
+
+    <div class="callout warning">
+      <ul>
+        <li>Automatic publishing of rewritten content.</li>
+        <li>Automatic deletion of pages.</li>
+        <li>Automatic redirects.</li>
+        <li>Automatic content rewriting based only on the model score.</li>
+        <li>Automatic claims that a page will decline.</li>
+      </ul>
+    </div>
+
+    <h3>Observed playbook output</h3>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <strong>27,534</strong>
+        <span>actionable pages in the exported queue</span>
+      </div>
+
+      <div class="metric">
+        <strong>27,306</strong>
+        <span>LOW_CTR review actions</span>
+      </div>
+
+      <div class="metric">
+        <strong>228</strong>
+        <span>refresh review actions</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 7. REPRODUCIBILITY -->
+
+  <section id="reproducibility">
+    <h2>7. Reproducibility</h2>
+
+    <p>
+      The analysis is organized as a sequence of notebooks covering data
+      preparation, modeling, validation, and action-playbook construction.
+    </p>
+
+    <ul>
+      <li>
+        <a href="https://github.com/hussaintinwala2/Flyrank">
+          Project repository
+        </a>
+      </li>
+
+      <li>
+        <a href="https://github.com/hussaintinwala2/Flyrank/tree/main/work/notebooks">
+          Notebook directory
+        </a>
+      </li>
+
+      <li>
+        <code>work/notebooks/w05_*.ipynb</code> —
+        Week-5 modeling work
+      </li>
+
+      <li>
+        <code>work/notebooks/w06_validation_audit.ipynb</code> —
+        validation and leakage audit
+      </li>
+
+      <li>
+        <code>work/notebooks/w07_action_playbook.ipynb</code> —
+        ranked action playbook
+      </li>
+
+      <li>
+        <code>work/notebooks/capstone.ipynb</code> —
+        capstone research summary
+      </li>
+    </ul>
+
+    <p>
+      The notebooks provide the computational record behind the reported
+      validation results and exported action queue.
+    </p>
+  </section>
+
+
+  <!-- 8. ACKNOWLEDGMENTS -->
+
+  <section id="acknowledgments">
+    <h2>8. Acknowledgments & Data Credit</h2>
+
+    <p>
+      Built on the
+      <a href="https://flyrank.ai">
+        FlyRank ML Internship dataset
+      </a>.
+    </p>
+
+    <p>
+      The analysis was completed as part of the FlyRank ML Internship
+      track. The dataset and project structure provided the basis for
+      developing and validating this research artifact.
+    </p>
+  </section>
+
+
+  <!-- 9. FINAL TAKEAWAY -->
+
+  <section id="takeaway">
+    <h2>9. Final Takeaway</h2>
+
+    <p>
+      The main lesson from this project is that validation design changes
+      how confidently a model result can be interpreted.
+    </p>
+
+    <p>
+      The observed ROC-AUC decreased from 0.586 under an earlier random
+      split to 0.538 when clients were held out during validation.
+      That difference is important: it makes the client-grouped result
+      the primary evidence for this study and limits the strength of the
+      claims that can reasonably be made.
+    </p>
+
+    <p>
+      The resulting system is therefore best viewed as a lightweight
+      decision-support workflow: identify measurable signals, rank pages
+      for attention, explain why a page entered the queue, and leave the
+      final content decision to a human reviewer.
+    </p>
+  </section>
+
+</main>
+
+
+<footer>
+  <div class="container">
+    <h2>Research artifact</h2>
+
+    <p>
+      Content Performance Decline — Validation-Aware Analysis
+    </p>
+
+    <p>
+      Built with the FlyRank ML Internship dataset.
+    </p>
+
+    <p>
+      <a href="https://github.com/hussaintinwala2/Flyrank">
+        View the project repository
+      </a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
